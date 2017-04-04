@@ -1,3 +1,22 @@
+// A global variable to hold information about the current game.
+var game_global;
+// We immediately call 'reset_game' to instantiate 'game_global' to its default values.
+reset_game();
+
+// This function resets 'game_global' to its default values.
+var reset_game = function() {
+	game_global = {
+		// This is the take and break game, e.g. ."77".
+		game: "",
+		// This is the calculated game value up to 'game_value.length'.
+		game_value: [],
+		// This is an array of heaps. The value in each index is the size of the heap.
+		board: [],
+		// If set to true, the computer will not play.
+		two_player: false,
+	};
+};
+
 // This function is called when the player presses the start button.
 var start = function() {
 	var tb_input = document.getElementById("gameInput").value;
