@@ -1,3 +1,11 @@
+// This function is called when the player presses the start button.
+var start = function() {
+	var tb_input = document.getElementById("gameInput").value;
+	var is_valid = is_valid_game(tb_input);
+	var csv_str = document.getElementById("boardInput").value;
+	var heaps = make_board(csv_str);
+};
+
 // Checks if the input for the game is valid, if so returns true, if not returns false.
 var is_valid_game = function(tb_input) {
 	// If the input is the empty string we return false.
