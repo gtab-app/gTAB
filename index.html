@@ -6,15 +6,15 @@
 </head>
 <body>
 	<h1>Generalized take and break</h1>
-	<p>Game: .<input type="text" /></p>
-	<p>Play vs. computer?<input type="checkbox" checked/></p>
+	<p>Game: .<input id="gameInput" type="text" /></p>
+	<p>Play vs. computer?<input id="playerTwoInput" type="checkbox" checked/></p>
 	<p>Who goes first?</p>
 	<form action="">
 		<input type="radio" name="firstPlayer" value="computer"/> Computer<br>
 		<input type="radio" name="firstPlayer" value="player"/> Player
 	</form>
 	<p>The board is defined as a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</p>
-	<p>Define board: <input type="text" /></p>
-	<input type="button" value="Start" />
+	<p>Define board: <input id="boardInput" type="text" /></p>
+	<input id="startButton" type="button" value="Start" />
 </body>
 </html>
