@@ -1,13 +1,13 @@
 // Checks if the input for the game is valid, if so returns true, if not returns false.
 var is_valid_game = function(tb_input) {
-	// Ignores leading period.
-	if (tb_input[0] === '.') {
-		tb_input = tb_input.substring(1);
-	}
 	// If the input is the empty string we return false.
 	if (tb_input.length === 0) {
 		console.error("Invalid game: empty string.");
 		return false;
+	}
+	// Ignores leading period.
+	if (tb_input[0] === '.') {
+		tb_input = tb_input.substring(1);
 	}
 	// If the value includes anything other than numbers 0-7 or is the empty string we return false.
 	if ((/[^0-7]/).test(tb_input)) {
@@ -42,9 +42,3 @@ var make_board = function(csv_str) {
 	}
 	return heaps;
 };
-
-console.log(make_board("1,2,3"));
-console.log(make_board("1,,3"));
-console.log(make_board("1,a2,3"));
-console.log(make_board("1, 2 , 3"));
-console.log(make_board("1,     ,3"));
