@@ -1,7 +1,5 @@
 // A global variable to hold information about the current game.
 var game_global;
-// We immediately call 'reset_game' to instantiate 'game_global' to its default values.
-reset_game();
 
 // This function resets 'game_global' to its default values.
 var reset_game = function() {
@@ -12,21 +10,30 @@ var reset_game = function() {
 		game_value: [],
 		// This is an array of heaps. The value in each index is the size of the heap.
 		board: [],
-		// If set to true, the computer will not play.
-		two_player: false,
+		// If set to false, the computer will not play.
+		one_player: true,
 	};
 };
+
+// We immediately call 'reset_game' to instantiate 'game_global' to its default values.
+reset_game();
 
 // This function is called when the player presses the start button.
 var start = function() {
 	var tb_input = document.getElementById("gameInput").value;
-	var is_valid = is_valid_game(tb_input);
+	var game = parse_game(tb_input);
 	var csv_str = document.getElementById("boardInput").value;
-	var heaps = make_board(csv_str);
+	var board = make_board(csv_str);
+	var one_player = document.getElementById("playerTwoInput").checked;
+	if (game && board) {
+		game_global.game = game;
+		game_global.board = board;
+		game_global.one_player = one_player;
+	}
 };
 
 // Checks if the input for the game is valid, if so returns true, if not returns false.
-var is_valid_game = function(tb_input) {
+var parse_game = function(tb_input) {
 	// If the input is the empty string we return false.
 	if (tb_input.length === 0) {
 		console.error("Invalid game: empty string.");
@@ -41,7 +48,7 @@ var is_valid_game = function(tb_input) {
 		console.error("Invalid game: numbers greater than 7 are not supported.");
 		return false;
 	}
-	return true;
+	return tb_input;
 };
 
 // Takes a comma separated string, and turns it into an array of ints.
