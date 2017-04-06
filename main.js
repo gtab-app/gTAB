@@ -76,3 +76,84 @@ var make_board = function(csv_str) {
 	}
 	return heaps;
 };
+
+// Takes distance to calculate and the game definition and returns the sequence up to the
+// largest heap value.
+var calculate_sequence = function (max, tb_input) {
+	// The first value in the sequence is always 0.
+	var sequence = [0];
+	var n = 1;
+
+	// We only build the sequence out to the max heap size because we do not need any more.
+	while (n <= max) {
+		// We use a set to prevent duplicate values.
+		var possible_values = new Set();
+		for (var i = 0; i < tb_input.length; i++) {
+			// The digit is the value in the game definition at the current index.
+			var digit = parseInt(tb_input[i]);
+			// k is the number of beans on which we are operating.
+			var k = i + 1;
+
+			// Whole heap.
+			// We check the rightmost bit to make sure we can remove k beans from an entire heap.
+			// Then we check if the current heap size is equal to k, which means we can remove the
+			// entire current heap. So we add 0 as a possible value (as we take the heap to size 0)
+			if (digit & 1 && n === k) {
+				possible_values.add(sequence[0]);
+			}
+
+			// End of heap.
+			// We check the middle bit to make sure we can remove k beans from the end of a heap.
+			// Then we check if the current heap size minus k is greater than 0. If it isn't, then
+			// we cannot remove from the end (which would result in a heap of negative size). We do
+			// not check for equality because that is taking an entire heap. If the condition passes
+			// we add the game value of the resulting heap size after removing k beans (n-k).
+			if (digit & 2 && n - k > 0) {
+				possible_values.add(sequence[n - k]);
+			}
+
+			// Middle of heap.
+			// We check the third bit to make sure we can remove k beans from the middle of the
+			// heap. We also verify that we would have at least 2 beans left over (n - k >= 2, or
+			// n - k > 1 for integers).
+			if (digit & 4 && n - k > 1) {
+				var a, b;
+				// We find all heap sizes a and b such that a + b = (n - k).
+				for (var j = 1; j <= (n - k) / 2; j++) {
+					a = j;
+					b = (n - k) - a;
+					// We XOR the nim values at sequence at a and b, and add them to the
+					// possible_values set.
+					possible_values.add(sequence[a] ^ sequence[b]);
+				}
+			}
+		}
+
+		var max;
+		// We find the maximum game value in the set.
+		possible_values.forEach(x => { last = x; });
+
+		// If no max was found, the set is empty, and we add 0 to the sequence.
+		if(!max) {
+			sequence.push(0);
+		}
+		// If the max is the length of the possible_values set plus one, we know
+		// we have all the natrual number from 0 to max, so we add max + 1 to 
+		// our sequence.
+		else if(max === possible_values.length + 1) {
+			sequence.push(max + 1);
+		}
+		// Else we do mex by finding the smalling excluded game value and push
+		// that to the sequence.
+		else {
+			for (var j = 0; j < max; j++) {
+				if (!possible_values.has(j)) {
+					sequence.push(j);
+					break;
+				}
+			}
+		}
+		n++;
+	}
+	return sequence;
+};
