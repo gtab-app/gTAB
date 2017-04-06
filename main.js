@@ -35,6 +35,12 @@ var start = function() {
 				var sequence = calculate_sequence(max_heap_size, game_global.game);
 				if (sequence) {
 					game_global.game_value = sequence;
+					var first_player_selector = document.querySelector('input[name="firstPlayer"]:checked');
+					if (first_player_selector && first_player_selector.value) {
+						if(first_player_selector.value === "computer") {
+							make_move();
+						}
+					}
 				}
 				else {
 					console.error("Sequence was not defined correctly.");
@@ -47,6 +53,10 @@ var start = function() {
 		console.error("Something went wrong... please try again.");
 		return;
 	}
+};
+
+var make_move = function() {
+
 };
 
 // Checks if the input for the game is valid, if so returns true, if not returns false.
