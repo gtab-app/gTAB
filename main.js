@@ -29,6 +29,23 @@ var start = function() {
 		game_global.game = game;
 		game_global.board = board;
 		game_global.one_player = one_player;
+		if(game_global.one_player) {
+			var max_heap_size = Math.max.apply(null, board);
+			if (max_heap_size) {
+				var sequence = calculate_sequence(max_heap_size, game_global.game);
+				if (sequence) {
+					game_global.game_value = sequence;
+				}
+				else {
+					console.error("Sequence was not defined correctly.");
+					return;
+				}
+			}
+		}
+	}
+	else {
+		console.error("Something went wrong... please try again.");
+		return;
 	}
 };
 
