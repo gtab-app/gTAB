@@ -132,6 +132,7 @@ Polymer({
 	// Takes distance to calculate and the game definition and returns the sequence up to the
 	// largest heap value.
 	calculate_sequence: function (max, tb_input) {
+		this._heap_possible_values = [];
 		// The first value in the sequence is always 0.
 		var sequence = [0];
 		var n = 1;
@@ -180,7 +181,9 @@ Polymer({
 					}
 				}
 			}
-	
+
+			this._heap_possible_values.push(possible_values);
+
 			var max;
 			// We find the maximum game value in the set.
 			possible_values.forEach(x => { last = x; });
