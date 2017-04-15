@@ -15,24 +15,39 @@
 	<p>The board is defined as a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</p>
 	<p>Define board: <input id="boardInput" type="text" /></p>
 	<input id="startButton" type="button" value="Start" on-tap="start"/>
+	<template is="dom-repeat" items="[[heaps]]">
+	</template>
 </template>
 <script>
 Polymer({
 	is: 'gtab-app',
 	properties: {
-		_game_global: {
-			type: Object,
-			value: {
-				// This is the take and break game, e.g. ."77".
-				game: "",
-				// This is the calculated game value up to 'game_value.length'.
-				game_value: [],
-				// This is an array of heaps. The value in each index is the size of the heap.
-				board: [],
-				// If set to false, the computer will not play.
-				one_player: true,
-			},
+		// This is the take and break game, e.g. ."77".
+		_game: {
+			type: String,
+			value: "",
 		},
+		// This is the calculated game value sequence.
+		_value_sequence: {
+			type: Array,
+			value: [],
+		},
+		// This is the board, an array of heaps. The value in each index is the size of the heap.
+		_heaps: {
+			type: Array,
+			value: [],
+		},
+		// If set to false, the computer will not play.
+		_one_player: {
+			type: Boolean,
+			value: true,
+		},
+		// These are the possible values that a game of size i can go to, where i is the index into
+		// this array.
+		_heap_possible_values: {
+			type: Array,
+			value: [],
+		}
 	},
 	start: function() {
 		var tb_input = this.$.gameInput.value;
@@ -41,15 +56,15 @@ Polymer({
 		var board = this.make_board(csv_str);
 		var one_player = this.$.playerTwoInput.checked;
 		if (game && board) {
-			this._game_global.game = game;
-			this._game_global.board = board;
-			this._game_global.one_player = one_player;
-			if(this._game_global.one_player) {
+			this._game = game;
+			this._heaps = board;
+			this._one_player = one_player;
+			if(this._one_player) {
 				var max_heap_size = Math.max.apply(null, board);
 				if (max_heap_size) {
-					var sequence = this.calculate_sequence(max_heap_size, this._game_global.game);
+					var sequence = this.calculate_sequence(max_heap_size, this._game);
 					if (sequence) {
-						this._game_global.game_value = sequence;
+						this._value_sequence = sequence;
 						var first_player_selector = document.querySelector('input[name="firstPlayer"]:checked');
 						if (first_player_selector && first_player_selector.value) {
 							if(first_player_selector.value === "computer") {
@@ -89,7 +104,6 @@ Polymer({
 		}
 		return tb_input;
 	},
-	
 	// Takes a comma separated string, and turns it into an array of ints.
 	make_board: function(csv_str) {
 		if(csv_str.length === 0) {
