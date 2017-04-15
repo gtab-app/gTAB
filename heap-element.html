@@ -1,0 +1,69 @@
+<base href="https://polygit.org/components/">
+<link href="polymer/polymer.html" rel="import">
+<link href="iron-input/iron-input.html" rel="import">
+<dom-module id="heap-element">
+<template>
+	<style>
+	</style>
+	<p><b>[[index]]</b></p>
+	<p>[[size]]</p>
+	<p><input type="button" value="Whole Heap" on-tap="_submit_whole"></p>
+	<p><input type="button" value="Take N from end" on-tap="_submit_end"> N: <input is="iron-input" type="number" bind-value="{{n}}"></p>
+	<p><input type="button" value="Split into X and Y" on-tap="_submit_split"> X: <input is="iron-input" type="number" bind-value="{{x}}"> Y: <input is="iron-input" type="number" bind-value="{{y}}"></p>
+</template>
+<script>
+	Polymer({
+		is: 'heap-element',
+		properties: {
+			index: {
+				type: Number,
+			},
+			size: {
+				type: Number,
+			},
+			game: {
+				type: String,
+			},
+		},
+		// A wrapper function for submitting whole heap removal moves.
+		_submit_whole: function() {
+			var move = {
+				type: 'whole',
+				index: this.index,
+				size: this.size,
+			};
+			this._submit(move);
+		},
+		// A wrapper function for submitting end of heap removal moves.
+		_submit_end: function() {
+			var move = {
+				type: 'end',
+				index: this.index,
+				size: this.size,
+				num: parseInt(this.n),
+			};
+			this._submit(move);
+		},
+		// A wrapper function for submitting splitting heap moves.
+		_submit_split: function() {
+			var move = {
+				type: 'split',
+				index: this.index,
+				size: this.size,
+				size1: parseInt(this.x),
+				size2: parseInt(this.y),
+			};
+			this._submit(move);
+		},
+		_clear: function() {
+			this.set('n', '');
+			this.set('x', '');
+			this.set('y', '');
+		},
+		_submit: function(move) {
+			this.fire('move-submission', move);
+			this._clear();
+		},
+	});
+</script>
+</dom-module>

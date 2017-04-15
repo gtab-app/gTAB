@@ -1,3 +1,4 @@
+<link href="heap-element.html" rel="import">
 <base href="https://polygit.org/components/">
 <link href="polymer/polymer.html" rel="import">
 <dom-module id="gtab-app">
@@ -15,7 +16,9 @@
 	<p>The board is defined as a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</p>
 	<p>Define board: <input id="boardInput" type="text" /></p>
 	<input id="startButton" type="button" value="Start" on-tap="start"/>
-	<template is="dom-repeat" items="[[heaps]]">
+	<template is="dom-repeat" items="[[_heaps]]">
+		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" on-move-submission="_make_move"></heap-element>
+		<hr>
 	</template>
 </template>
 <script>
@@ -47,6 +50,10 @@ Polymer({
 		_heap_possible_values: {
 			type: Array,
 			value: [],
+		},
+		_moves: {
+			type: Array,
+			value: [],
 		}
 	},
 	start: function() {
@@ -57,7 +64,7 @@ Polymer({
 		var one_player = this.$.playerTwoInput.checked;
 		if (game && board) {
 			this._game = game;
-			this._heaps = board;
+			this.set('_heaps', board);
 			this._one_player = one_player;
 			if(this._one_player) {
 				var max_heap_size = Math.max.apply(null, board);
@@ -84,7 +91,56 @@ Polymer({
 			return;
 		}
 	},
-	make_move: function() {
+	_make_move: function(event) {
+		var move = event.detail;
+		var success = false;
+		switch (move.type) {
+			case 'whole':
+				// We verify that this move is valid.
+				if(this._heaps.length > move.index && this._game.length > (move.size - 1) && this._game[move.size - 1] && parseInt(this._game[move.size - 1])) {
+					var val = parseInt(this._game[move.size - 1]);
+					if(val ^ 1) {
+						// If the move is valid, we execute the move.
+						this.splice('_heaps', move.index, 1);
+						success = true;
+						break;
+					}
+				}
+				break;
+			case 'end':
+				// We verify that this move is valid.
+				if(this._heaps.length > move.index && this._game.length > (move.num - 1) && this._game[move.num - 1] && parseInt(this._game[move.num - 1])) {
+					var val = parseInt(this._game[move.num - 1]);
+					var result = this._heaps[move.index].value - move.num;
+					if(val ^ 2 && result > 0) {
+						// If the move is valid, we execute the move.
+						this.splice('_heaps', move.index, 1, { value: result });
+						success = true;
+						break;
+					}
+				}
+				break;
+			case 'split':
+				// We calculate the number that would be removed by the split.
+				var num_split = move.size - (move.size1 + move.size2);
+				// We verify that this move is valid.
+				if(this._heaps.length > move.index && this._game.length > (num_split - 1) && this._game[num_split - 1] && parseInt(this._game[num_split - 1]) && num_split > 0 && move.size1 > 0 && move.size2 > 0) {
+					var val = parseInt(this._game[num_split - 1]);
+					if(val ^ 4) {
+						// If the move is valid, we execute the move.
+						this.splice('_heaps', move.index, 1, { value: move.size1 }, { value: move.size2 } );
+						success = true;
+						break;
+					}
+				}
+				break;
+			default:
+				break;
+		}
+		// If the move was successful, we add it to the move stack.
+		if(success) {
+			this.push('_moves', move);
+		}
 	},
 	// Checks if the input for the game is valid, if so returns true, if not returns false.
 	parse_game: function(tb_input) {
@@ -121,7 +177,7 @@ Polymer({
 			if(v.length === 0) {
 				return 0;
 			}
-			return parseInt( v );
+			return { value: parseInt(v) };
 		});
 		if(heaps.length === 0) {
 			console.error("Invalid board: heaps are empty.");
