@@ -4,18 +4,57 @@
 <dom-module id="gtab-app">
 <template>
 	<style>
+		.form-group, .form-check {
+			padding-bottom: 5px;
+		}
+
+		.radtab {
+			padding-left: 15px;
+		}
+
+		.input-game {
+			max-width: 471px;
+		}
+
+		.input-board {
+			max-width: 500px;
+		}
 	</style>
 	<h1>Generalized take and break</h1>
-	<p>Game: .<input id="gameInput" type="text" /></p>
-	<p>Play vs. computer?<input id="playerTwoInput" type="checkbox" checked/></p>
-	<p>Who goes first?</p>
-	<form action="">
-		<input type="radio" name="firstPlayer" value="computer"/> Computer<br>
-		<input type="radio" name="firstPlayer" value="player" checked/> Player
+	<div id="gameInputWrapper" class="form-group">
+		<label id="gameInputLabel" for="boardInput">Define Game:</label>
+		<div class="input-group">
+			<span class="input-group-addon" id="basic-addon1">.</span>
+			<input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel" />
+		</div>
+		<small id="gameInputHelp" class="form-text text-muted">The game is defined by any number such that each digit of the number is between 0 and 7 inclusive. For Example: 147.</small>
+	</div>
+	<!--I think this is write for hiding/showing elements in polymer. Not sure how to tie to backend-->
+	<div id="game-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_game}}">Oh No! Your game was not properly formatted. Try something like 34 (Dawson's Chess).</div>
+
+	<div id="playerTwoInputWrapper" class="form-check">
+		<label for="playerTwoInput" class="form-check-label">Play versus AI?
+			<input class="form-check-input" id="playerTwoInput" type="checkbox" checked/>
+		</label>
+	</div>
+
+	<label for="playerSelection">Who goes first?</label>
+	<form id="playerSelection" class="form-group radtab" action="">
+		<input class="form-check-input" type="radio" name="firstPlayer" value="computer" /> Computer<br>
+		<input class="form-check-input" type="radio" name="firstPlayer" value="player" checked /> Player
 	</form>
-	<p>The board is defined as a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</p>
-	<p>Define board: <input id="boardInput" type="text" /></p>
-	<input id="startButton" type="button" value="Start" on-tap="start"/>
+	<div class="spacer"></div>
+
+	<label for="boardInput">Define board:</label>
+	<div id="boardInputWrapper" class="form-group">
+		<input id="boardInput" type="text" class="form-control input-board" aria-describedby="boardInputHelp" placeholder="Board" />
+		<small id="boardInputHelp" class="form-text text-muted">The board is defined by a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</small>
+	</div>
+
+	<!--I think this is write for hiding/showing elements in polymer. Not sure how to tie to backend-->
+	<div id="board-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_board}}">Oh no! Your game board was not formatted properly. Try something like 3, 4, 5.</div>
+
+	<button id="startButton" type="button" class="btn btn-default" on-tap="start">Start</button>
 	<template is="dom-repeat" items="[[_heaps]]">
 		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" on-move-submission="_make_move"></heap-element>
 		<hr>
@@ -54,9 +93,21 @@ Polymer({
 		_moves: {
 			type: Array,
 			value: [],
-		}
+		},
+		// This controls the display for the game input error message.
+		_invalid_game: {
+			type: Boolean,
+			value: false,
+		},
+		// This controls the display for the board input error message.
+		_invalid_board: {
+			type: Boolean,
+			value: false,
+		},
 	},
 	start: function() {
+		this.set('_invalid_board', false);
+		this.set('_invalid_game', false);
 		var tb_input = this.$.gameInput.value;
 		var game = this.parse_game(tb_input);
 		var csv_str = this.$.boardInput.value;
@@ -147,6 +198,7 @@ Polymer({
 		// If the input is the empty string we return false.
 		if (tb_input.length === 0) {
 			console.error("Invalid game: empty string.");
+			this.set('_invalid_game', true);
 			return false;
 		}
 		// Ignores leading period.
@@ -156,6 +208,7 @@ Polymer({
 		// If the value includes anything other than numbers 0-7 or is the empty string we return false.
 		if ((/[^0-7]/).test(tb_input)) {
 			console.error("Invalid game: numbers greater than 7 are not supported.");
+			this.set('_invalid_game', true);
 			return false;
 		}
 		return tb_input;
@@ -164,11 +217,13 @@ Polymer({
 	make_board: function(csv_str) {
 		if(csv_str.length === 0) {
 			console.error("Invalid board: no board defined.");
+			this.set('_invalid_board', true);
 			return false;
 		}
 		// Checks if the array includes any illegal characters.
 		if (/[^0-9, ]/.test(csv_str)) {
 			console.error("Invalid board: string contains invalid characters.");
+			this.set('_invalid_board', true);
 			return false;
 		}
 		var heaps = csv_str.split(',');
@@ -181,6 +236,7 @@ Polymer({
 		});
 		if(heaps.length === 0) {
 			console.error("Invalid board: heaps are empty.");
+			this.set('_invalid_board', true);
 			return false;
 		}
 		return heaps;
