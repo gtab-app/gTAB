@@ -25,7 +25,7 @@
 		<label id="gameInputLabel" for="boardInput">Define Game:</label>
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1">.</span>
-			<input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel" />
+		<input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel" />
 		</div>
 		<small id="gameInputHelp" class="form-text text-muted">The game is defined by any number such that each digit of the number is between 0 and 7 inclusive. For Example: 147.</small>
 	</div>
@@ -55,9 +55,11 @@
 	<div id="board-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_board}}">Oh no! Your game board was not formatted properly. Try something like 3, 4, 5.</div>
 
 	<button id="startButton" type="button" class="btn btn-default" on-tap="start">Start</button>
+
+	<div class="spacer"></div>
+	<hr>
 	<template is="dom-repeat" items="[[_heaps]]">
-		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" on-move-submission="_make_move"></heap-element>
-		<hr>
+		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" max="[[_max_heap_size]]" on-move-submission="_player_make_move"></heap-element>
 	</template>
 </template>
 <script>
@@ -117,8 +119,13 @@ Polymer({
 			this._game = game;
 			this.set('_heaps', board);
 			this._one_player = one_player;
+			var max_heap_size = 0;
+			for(var i = 0; i < this._heaps.length; i++) {
+				max_heap_size = Math.max(max_heap_size, this._heaps[i].value);
+			}
+			console.log(max_heap_size);
+			this.set("_max_heap_size", max_heap_size);
 			if(this._one_player) {
-				var max_heap_size = Math.max.apply(null, board);
 				if (max_heap_size) {
 					var sequence = this.calculate_sequence(max_heap_size, this._game);
 					if (sequence) {
@@ -126,7 +133,7 @@ Polymer({
 						var first_player_selector = document.querySelector('input[name="firstPlayer"]:checked');
 						if (first_player_selector && first_player_selector.value) {
 							if(first_player_selector.value === "computer") {
-								this.make_move();
+								this._ai_make_move();
 							}
 						}
 					}
@@ -142,15 +149,105 @@ Polymer({
 			return;
 		}
 	},
-	_make_move: function(event) {
-		var move = event.detail;
+	_ai_make_move: function() {
+		var found_move = false;
+		var move;
+		// We iterate over every heap.
+		for(var h = 0; h < this._heaps.length && !found_move; h++) {
+			// We calculate the value of the game minus the current heap we are on.
+			var val = 0;
+			for(var inner_heap_index = 0; inner_heap_index < this._heaps.length; inner_heap_index++) {
+				if(inner_heap_index === h) {
+					continue;
+				}
+				val ^= this._value_sequence[this._heaps[inner_heap_index].value];
+			}
+			// If the _heap_possible_values for a heap of the size of the one we excluded contains
+			// the value of the rest of the game, by playing to that game position we can make the
+			// game a zero game and ensure we are in a winning position.
+			if(this._heap_possible_values[this._heaps[h].value].has(val)) {
+				// At this point we know a winning move exists, we just need to find it.
+				// We use the same value finding code from before.
+				var n = this._heaps[h].value;
+				for (var i = 0; i < this._game.length; i++) {
+					var digit = parseInt(this._game[i]);
+					var k = i + 1;
+					if (digit & 1 && n === k && !found_move) {
+						move = {
+							type: 'whole',
+							index: h,
+							size: n,
+						};
+						if(this._value_sequence[0] === val) {
+							found_move = true;
+							break;
+						}
+					}
+					if (digit & 2 && n - k > 0 && !found_move) {
+						move = {
+							type: 'end',
+							index: h,
+							size: n,
+							num: k,
+						};
+						if(this._value_sequence[n - k] === val) {
+							found_move = true;
+							break;
+						}
+					}
+					if (digit & 4 && n - k > 1 && !found_move) {
+						var a, b;
+						for (var j = 1; j <= (n - k) / 2; j++) {
+							a = j;
+							b = (n - k) - a;
+							move = {
+								type: 'split',
+								index: h,
+								size: n,
+								size1: a,
+								size2: b,
+							};
+							if((this._value_sequence[a] ^ this._value_sequence[b]) === val) {
+								found_move = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+		if(!found_move && !move) {
+			console.log("You win!");
+		}
+		else if(!found_move && move) {
+			var success = this._make_move(move);
+			if(success) {
+				this._moves.push(move);
+			}
+			console.log("I'm going to lose...");
+		}
+		else if(found_move && move) {
+			var success = this._make_move(move);
+			if(success) {
+				this._moves.push(move);
+			}
+			console.log("I'm going to win!");
+		}
+	},
+	_player_make_move: function(event) {
+		var success = this._make_move(event.detail);
+		if(success && this._one_player) {
+			this._ai_make_move();
+		}
+	},
+	_make_move: function(move) {
 		var success = false;
 		switch (move.type) {
 			case 'whole':
 				// We verify that this move is valid.
 				if(this._heaps.length > move.index && this._game.length > (move.size - 1) && this._game[move.size - 1] && parseInt(this._game[move.size - 1])) {
 					var val = parseInt(this._game[move.size - 1]);
-					if(val ^ 1) {
+					if(val & 1) {
 						// If the move is valid, we execute the move.
 						this.splice('_heaps', move.index, 1);
 						success = true;
@@ -163,7 +260,7 @@ Polymer({
 				if(this._heaps.length > move.index && this._game.length > (move.num - 1) && this._game[move.num - 1] && parseInt(this._game[move.num - 1])) {
 					var val = parseInt(this._game[move.num - 1]);
 					var result = this._heaps[move.index].value - move.num;
-					if(val ^ 2 && result > 0) {
+					if(val & 2 && result > 0) {
 						// If the move is valid, we execute the move.
 						this.splice('_heaps', move.index, 1, { value: result });
 						success = true;
@@ -177,7 +274,7 @@ Polymer({
 				// We verify that this move is valid.
 				if(this._heaps.length > move.index && this._game.length > (num_split - 1) && this._game[num_split - 1] && parseInt(this._game[num_split - 1]) && num_split > 0 && move.size1 > 0 && move.size2 > 0) {
 					var val = parseInt(this._game[num_split - 1]);
-					if(val ^ 4) {
+					if(val & 4) {
 						// If the move is valid, we execute the move.
 						this.splice('_heaps', move.index, 1, { value: move.size1 }, { value: move.size2 } );
 						success = true;
@@ -192,6 +289,7 @@ Polymer({
 		if(success) {
 			this.push('_moves', move);
 		}
+		return success;
 	},
 	// Checks if the input for the game is valid, if so returns true, if not returns false.
 	parse_game: function(tb_input) {
@@ -244,7 +342,7 @@ Polymer({
 	// Takes distance to calculate and the game definition and returns the sequence up to the
 	// largest heap value.
 	calculate_sequence: function (max, tb_input) {
-		this._heap_possible_values = [];
+		this._heap_possible_values = [new Set()];
 		// The first value in the sequence is always 0.
 		var sequence = [0];
 		var n = 1;
