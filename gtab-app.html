@@ -59,7 +59,7 @@
 	<div class="spacer"></div>
 	<hr>
 	<template is="dom-repeat" items="[[_heaps]]">
-		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" on-move-submission="_player_make_move"></heap-element>
+		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" max="[[_max_heap_size]]" on-move-submission="_player_make_move"></heap-element>
 	</template>
 </template>
 <script>
@@ -119,11 +119,13 @@ Polymer({
 			this._game = game;
 			this.set('_heaps', board);
 			this._one_player = one_player;
+			var max_heap_size = 0;
+			for(var i = 0; i < this._heaps.length; i++) {
+				max_heap_size = Math.max(max_heap_size, this._heaps[i].value);
+			}
+			console.log(max_heap_size);
+			this.set("_max_heap_size", max_heap_size);
 			if(this._one_player) {
-				var max_heap_size = 0;
-				for(var i = 0; i < this._heaps.length; i++) {
-					max_heap_size = Math.max(max_heap_size, this._heaps[i].value);
-				}
 				if (max_heap_size) {
 					var sequence = this.calculate_sequence(max_heap_size, this._game);
 					if (sequence) {
