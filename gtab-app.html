@@ -25,7 +25,7 @@
 		<label id="gameInputLabel" for="boardInput">Define Game:</label>
 		<div class="input-group">
 			<span class="input-group-addon" id="basic-addon1">.</span>
-			<input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel" />
+		<input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel" />
 		</div>
 		<small id="gameInputHelp" class="form-text text-muted">The game is defined by any number such that each digit of the number is between 0 and 7 inclusive. For Example: 147.</small>
 	</div>
@@ -55,9 +55,11 @@
 	<div id="board-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_board}}">Oh no! Your game board was not formatted properly. Try something like 3, 4, 5.</div>
 
 	<button id="startButton" type="button" class="btn btn-default" on-tap="start">Start</button>
+
+	<div class="spacer"></div>
+	<hr>
 	<template is="dom-repeat" items="[[_heaps]]">
 		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" on-move-submission="_player_make_move"></heap-element>
-		<hr>
 	</template>
 </template>
 <script>
