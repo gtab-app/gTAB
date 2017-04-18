@@ -147,6 +147,57 @@ Polymer({
 			return;
 		}
 	},
+	_find_any_move: function() {
+		var move;
+
+		for(var y = 0; y < this._heaps.length; y++) {
+			var hs = this._heaps[y].value;
+			for(var z = 0; z < this._game.length; z++) {
+				var gi = z + 1;
+				if(parseInt(this._game[z]) & 1 > 0) {
+					// We can take the whole heap
+					if(hs === gi) {
+						move = {
+							type: 'whole',
+							index: y,
+							size: this._heaps[y],
+						}
+						return move;
+					}
+				}
+
+				if(parseInt(this._game[z]) & 2 > 0) {
+					if(hs > gi) {
+						move = {
+							type: 'end',
+							index: y,
+							size: hs,
+							num: gi,
+						};
+						return move;
+					}
+				}
+
+				if (parseInt(this._game[z]) & 4 && hs - gi > 1) {
+					var a, b;
+					for (var j = 1; j <= (hs - gi) / 2; j++) {
+						a = j;
+						b = (hs - gi) - a;
+						move = {
+							type: 'split',
+							index: y,
+							size: hs,
+							size1: a,
+							size2: b,
+						};
+						return move;
+					}
+				}
+			}
+		}
+
+		return undefined;
+	},
 	_ai_make_move: function() {
 		console.log(this._heaps);
 		var found_move = false;
@@ -216,27 +267,31 @@ Polymer({
 			}
 		}
 		if(!found_move && !move) {
+			move = this._find_any_move();
+			var success = this._make_move(move);
 			console.log("You win!");
 		}
 		else if(!found_move && move) {
 			var success = this._make_move(move);
-			if(success) {
-				this._moves.push(move);
-			}
 			console.log("I'm going to lose...");
 		}
 		else if(found_move && move) {
 			var success = this._make_move(move);
-			if(success) {
-				this._moves.push(move);
-			}
 			console.log("I'm going to win!");
 		}
 	},
+
 	_player_make_move: function(event) {
 		var success = this._make_move(event.detail);
-		if(success && this._one_player) {
-			this._ai_make_move();
+		if(success) {
+			var move = this._find_any_move();
+			if(!move) {
+				console.log("You win");
+			}
+
+			else if(this._one_player) {
+				this._ai_make_move();
+			}
 		}
 	},
 	_make_move: function(move) {
