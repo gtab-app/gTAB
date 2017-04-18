@@ -35,7 +35,7 @@
 		</div>
 		<small id="gameInputHelp" class="form-text text-muted">The game is defined by any number such that each digit of the number is between 0 and 7 inclusive. For Example: 147.</small>
 	</div>
-	<!--I think this is write for hiding/showing elements in polymer. Not sure how to tie to backend-->
+
 	<div id="game-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_game}}">Oh No! Your game was not properly formatted. Try something like 34 (Dawson's Chess).</div>
 
 	<div id="playerTwoInputWrapper" class="form-check">
@@ -57,7 +57,6 @@
 		<small id="boardInputHelp" class="form-text text-muted">The board is defined by a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</small>
 	</div>
 
-	<!--I think this is write for hiding/showing elements in polymer. Not sure how to tie to backend-->
 	<div id="board-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_board}}">Oh no! Your game board was not formatted properly. Try something like 3, 4, 5.</div>
 
 	<button id="startButton" type="button" class="btn btn-default" on-tap="start">Start</button>
@@ -66,6 +65,9 @@
 	<hr>
 	<template is="dom-repeat" items="[[_heaps]]">
 		<heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" max="[[_max_heap_size]]" on-move-submission="_player_make_move"></heap-element>
+	</template>
+	<template is="dom-if" if="[[_game_over]]" restamp="true">
+		<h2>[[_game_over_message]]</h2>
 	</template>
 </template>
 <script>
@@ -98,6 +100,7 @@ Polymer({
 			type: Array,
 			value: [],
 		},
+		// A stack containing all the moves made.
 		_moves: {
 			type: Array,
 			value: [],
@@ -115,6 +118,7 @@ Polymer({
 	},
 	start: function() {
 		this.set('_moves', []);
+		this.set('_game_over', false);
 		this.set('_invalid_board', false);
 		this.set('_invalid_game', false);
 		var tb_input = this.$.gameInput.value;
@@ -162,7 +166,8 @@ Polymer({
 			var hs = this._heaps[y].value;
 			for(var z = 0; z < this._game.length; z++) {
 				var gi = z + 1;
-				if(parseInt(this._game[z]) & 1) {
+				var val = parseInt(this._game[z]);
+				if(val & 1) {
 					// We can take the whole heap
 					if(hs === gi) {
 						move = {
@@ -174,7 +179,7 @@ Polymer({
 					}
 				}
 
-				if(parseInt(this._game[z]) & 2) {
+				if(val & 2) {
 					if(hs > gi) {
 						move = {
 							type: 'end',
@@ -186,7 +191,7 @@ Polymer({
 					}
 				}
 
-				if (parseInt(this._game[z]) & 4 && hs - gi > 1) {
+				if (val & 4 && hs - gi > 1) {
 					var a, b;
 					for (var j = 1; j <= (hs - gi) / 2; j++) {
 						a = j;
@@ -280,13 +285,14 @@ Polymer({
 			}
 			console.log("No winning strategy.");
 		}
-		// else if(!found_move && move) {
-		// 	var success = this._make_move(move);
-		// 	console.log("I'm going to lose...");
-		// }
 		else if(found_move && move) {
 			var success = this._make_move(move);
 			console.log("I'm going to win!");
+		}
+		move = this._find_any_move();
+		if(!move) {
+			this.set('_game_over', true);
+			this.set('_game_over_message', "You lose!");
 		}
 	},
 
@@ -296,6 +302,8 @@ Polymer({
 			var move = this._find_any_move();
 			if(!move) {
 				console.log("You win");
+				this.set('_game_over', true);
+				this.set('_game_over_message', "You win!");
 			}
 			else if(this._one_player) {
 				this._ai_make_move();
