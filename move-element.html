@@ -1,0 +1,56 @@
+<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
+<dom-module id="move-element">
+<template>
+	<style>
+		.move-box {
+			width: 250px;
+			margin-bottom: 5px;
+			border-color: #ddd;
+			border-width: 1px;
+			border-radius: 4px 4px 0 0;
+			border-style: solid;
+			padding: 5px;
+			text-align: center;
+		}
+	</style>
+	<div class="move-box">
+		<p>[[_move_string]]</p>
+	</div>
+</template>
+<script>
+	Polymer({
+		is: 'move-element',
+		properties: {
+			move: {
+				type: Object,
+				value: {},
+				observer: '_move_changed',
+			},
+			_move_string: {
+				type: String,
+				value: "",
+			}
+		},
+		_move_changed: function() {
+			switch(this.move.type) {
+				case 'whole':
+					this.set('_move_string', "A whole pile of size " + this.move.size + " was taken.");
+					break;
+				case 'end':
+					if(this.move.num === 1) {
+						this.set('_move_string', this.move.num + " bean was removed from the end of a heap of size " + this.move.size + ".");
+					}
+					else if(this.move.num > 1) {
+						this.set('_move_string', this.move.num + " beans were removed from the end of a heap of size " + this.move.size + ".");
+					}
+					break;
+				case 'split':
+					this.set('_move_string', "A heap of size " + this.move.size + " was split into heaps of size " + this.move.size2 + " and " + this.move.size2 + ".");
+					break;
+				default:
+					this.set('_move_string', "Unkown move.");
+			}
+		}
+	});
+</script>
+</dom-module>
