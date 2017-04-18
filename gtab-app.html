@@ -162,19 +162,19 @@ Polymer({
 			var hs = this._heaps[y].value;
 			for(var z = 0; z < this._game.length; z++) {
 				var gi = z + 1;
-				if(parseInt(this._game[z]) & 1 > 0) {
+				if(parseInt(this._game[z]) & 1) {
 					// We can take the whole heap
 					if(hs === gi) {
 						move = {
 							type: 'whole',
 							index: y,
-							size: this._heaps[y],
+							size: hs,
 						}
 						return move;
 					}
 				}
 
-				if(parseInt(this._game[z]) & 2 > 0) {
+				if(parseInt(this._game[z]) & 2) {
 					if(hs > gi) {
 						move = {
 							type: 'end',
@@ -207,7 +207,6 @@ Polymer({
 		return undefined;
 	},
 	_ai_make_move: function() {
-		console.log(this._heaps);
 		var found_move = false;
 		var move;
 		// We iterate over every heap.
@@ -276,13 +275,15 @@ Polymer({
 		}
 		if(!found_move && !move) {
 			move = this._find_any_move();
-			var success = this._make_move(move);
-			console.log("You win!");
+			if(move) {
+				var success = this._make_move(move);
+			}
+			console.log("No winning strategy.");
 		}
-		else if(!found_move && move) {
-			var success = this._make_move(move);
-			console.log("I'm going to lose...");
-		}
+		// else if(!found_move && move) {
+		// 	var success = this._make_move(move);
+		// 	console.log("I'm going to lose...");
+		// }
 		else if(found_move && move) {
 			var success = this._make_move(move);
 			console.log("I'm going to win!");
@@ -296,7 +297,6 @@ Polymer({
 			if(!move) {
 				console.log("You win");
 			}
-
 			else if(this._one_player) {
 				this._ai_make_move();
 			}
