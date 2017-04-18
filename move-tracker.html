@@ -1,0 +1,31 @@
+<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
+<link href="move-element.html" rel="import">
+
+<dom-module id="move-tracker">
+<template>
+	<style>
+		.moves-container {
+			overflow-y: scroll;
+			flex: 1;
+			flex-direction: column;
+			max-height: inherit;
+		}
+	</style>
+	<div class="moves-container">
+		<template is="dom-repeat" items="[[moves]]">
+			<move-element move="[[item]]"></move-element>
+		</template>
+	</div>
+</template>
+<script>
+	Polymer({
+		is: 'move-tracker',
+		properties: {
+			moves: {
+				type: Array,
+				value: [],
+			}
+		},
+	});
+</script>
+</dom-module>
