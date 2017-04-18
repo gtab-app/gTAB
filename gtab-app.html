@@ -122,7 +122,6 @@ Polymer({
 			for(var i = 0; i < this._heaps.length; i++) {
 				max_heap_size = Math.max(max_heap_size, this._heaps[i].value);
 			}
-			console.log(max_heap_size);
 			this.set("_max_heap_size", max_heap_size);
 			if(this._one_player) {
 				if (max_heap_size) {
@@ -149,6 +148,7 @@ Polymer({
 		}
 	},
 	_ai_make_move: function() {
+		console.log(this._heaps);
 		var found_move = false;
 		var move;
 		// We iterate over every heap.
@@ -410,7 +410,7 @@ Polymer({
 			// Else we do mex by finding the smalling excluded game value and push
 			// that to the sequence.
 			else {
-				for (var j = 0; j < max; j++) {
+				for (var j = 0; j <= max; j++) {
 					if (!possible_values.has(j)) {
 						sequence.push(j);
 						break;
