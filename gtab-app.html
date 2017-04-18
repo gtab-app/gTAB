@@ -1,6 +1,5 @@
 <link href="heap-element.html" rel="import">
-<base href="https://polygit.org/components/">
-<link href="polymer/polymer.html" rel="import">
+<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
 <dom-module id="gtab-app">
 <template>
 	<style>
@@ -319,7 +318,7 @@ Polymer({
 			return false;
 		}
 		// Checks if the array includes any illegal characters.
-		if (/[^0-9, ]/.test(csv_str)) {
+		if ((/[^0-9, ]/).test(csv_str)) {
 			console.error("Invalid board: string contains invalid characters.");
 			this.set('_invalid_board', true);
 			return false;
@@ -421,7 +420,7 @@ Polymer({
 			n++;
 		}
 		return sequence;
-	},
+	}
 });
 </script>
 </dom-module>
