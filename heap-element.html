@@ -21,13 +21,13 @@
 		}
 		
 		.input-x {
-			max-width: 400px;
-		}
-		
-		.input-y {
-			max-width: 400px;
+			max-width: 500px;
 		}
 
+		input-y {
+			max-width: 500px;
+		}
+		
 		.min-but {
 			min-width: 140px;
 		}
@@ -51,6 +51,19 @@
 			display: flex;
 			align-items: center;
 		}
+
+		@media screen and (max-width: 1220px) {
+			.mid-heap-y {
+				width: 100%;
+				width: calc(100% - 142px);
+				padding-top: 7px;
+				margin-left: 142px;
+			}
+
+			.mid-heap-x {
+				width: 100%;
+			}
+		}
 	</style>
 	<div class="row heap-display">
 		<div class="col-lg-10">
@@ -72,7 +85,7 @@
 
 				<div class="form-group">
 					<div class="row">
-						<div class="col-lg-6">
+						<div class="col-lg-7">
 							<div class="input-group mid-heap-x">
 								<span class="input-group-btn">
 									<button class="btn btn-default min-but" type="button" value="Split into X and Y" on-tap="_submit_split">Split into 'x' and 'y'</button>
@@ -82,7 +95,7 @@
 							</div>
 						</div>
 
-						<div class="col-lg-6">
+						<div class="col-lg-5">
 							<div class="input-group mid-heap-y">
 								<span class="input-group-addon" id="basic-addon1">y</span>
 								<input class="form-control input-y" is="iron-input" type="number" bind-value="{{y}}" />
