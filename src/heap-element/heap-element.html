@@ -1,5 +1,6 @@
-<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
-<link href="https://polygit.org/components/iron-input/iron-input.html" rel="import">
+<link href="../../bower_components/polymer/polymer.html" rel="import">
+<link href="../../bower_components/iron-input/iron-input.html" rel="import">
+
 <dom-module id="heap-element">
 <template>
 	<style>
@@ -90,14 +91,12 @@
 								<span class="input-group-btn">
 									<button class="btn btn-default min-but" type="button" value="Split into X and Y" on-tap="_submit_split">Split into 'x' and 'y'</button>
 								</span>
-								<span class="input-group-addon" id="basic-addon1">x</span>
 								<input class="form-control input-x" is="iron-input" type="number" bind-value="{{x}}">
 							</div>
 						</div>
 
 						<div class="col-lg-5">
 							<div class="input-group mid-heap-y">
-								<span class="input-group-addon" id="basic-addon1">y</span>
 								<input class="form-control input-y" is="iron-input" type="number" bind-value="{{y}}" />
 							</div>
 						</div>

@@ -1,0 +1,15 @@
+{
+	"entrypoint": "index.html",
+	"shell": "src/gtab-app/gtab-app.html",
+	"fragments": [
+		"bower_components/polymer/polymer.html"
+	],
+	"sources": [
+		"src/**/*",
+		"bower.json"
+	],
+	"includeDependencies": [
+		"bower_components/webcomponentsjs/webcomponents-lite.js",
+		"bower_components/bootstrap/dist/css/bootstrap.min.css"
+	]
+}

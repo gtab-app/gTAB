@@ -1,6 +1,7 @@
-<link href="heap-element.html" rel="import">
-<link href="move-tracker.html" rel="import">
-<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
+<link href="../../bower_components/polymer/polymer.html" rel="import">
+<link href="../heap-element/heap-element.html" rel="import">
+<link href="../move-tracker/move-tracker.html" rel="import">
+
 <dom-module id="gtab-app">
 <template>
 	<style>
@@ -381,7 +382,7 @@ Polymer({
 		}
 		return tb_input;
 	},
-	// Takes a comma separated string, and turns it into an array of ints.
+	// Takes a comma separated string, and turns it into an array of integers.
 	make_board: function(csv_str) {
 		if(csv_str.length === 0) {
 			console.error("Invalid board: no board defined.");
@@ -466,19 +467,19 @@ Polymer({
 
 			var max;
 			// We find the maximum game value in the set.
-			possible_values.forEach(x => { last = x; });
+			possible_values.forEach(function(x) { last = x; });
 	
 			// If no max was found, the set is empty, and we add 0 to the sequence.
 			if(!max) {
 				sequence.push(0);
 			}
 			// If the max is the length of the possible_values set plus one, we know
-			// we have all the natrual number from 0 to max, so we add max + 1 to 
+			// we have all the natural number from 0 to max, so we add max + 1 to 
 			// our sequence.
 			else if(max === possible_values.length + 1) {
 				sequence.push(max + 1);
 			}
-			// Else we do mex by finding the smalling excluded game value and push
+			// Else we do mex by finding the smallest excluded game value and push
 			// that to the sequence.
 			else {
 				for (var j = 0; j <= max; j++) {

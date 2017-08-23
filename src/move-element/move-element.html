@@ -1,4 +1,5 @@
-<link href="https://polygit.org/components/polymer/polymer.html" rel="import">
+<link href="../../bower_components/polymer/polymer.html" rel="import">
+
 <dom-module id="move-element">
 <template>
 	<style>
@@ -48,7 +49,7 @@
 					this.set('_move_string', "A heap of size " + this.move.size + " was split into heaps of size " + this.move.size2 + " and " + this.move.size2 + ".");
 					break;
 				default:
-					this.set('_move_string', "Unkown move.");
+					this.set('_move_string', "Unknown move.");
 			}
 		}
 	});

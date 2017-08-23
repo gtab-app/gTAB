@@ -1,0 +1,13 @@
+{
+  "name": "gTAB",
+  "main": "index.html",
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.4.0",
+    "webcomponentsjs": "webcomponents/webcomponentsjs#^0.7.0",
+    "iron-input": "PolymerElements/iron-input#^1.0.0",
+    "bootstrap": "3.3.7"
+  },
+  "resolutions": {
+    "webcomponentsjs": "^0.7.0"
+  }
+}
