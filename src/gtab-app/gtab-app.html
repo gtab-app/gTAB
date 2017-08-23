@@ -1,0 +1,98 @@
+<div hidden="" by-polymer-bundler=""><link href="../../bower_components/polymer/polymer.html" rel="import"><dom-module id="iron-a11y-announcer" assetpath="../../bower_components/iron-a11y-announcer/"><template><style>:host {
+        display: inline-block;
+        position: fixed;
+        clip: rect(0px,0px,0px,0px);
+      }</style><div aria-live$="[[mode]]">[[_text]]</div></template><script>!function(){"use strict";Polymer.IronA11yAnnouncer=Polymer({is:"iron-a11y-announcer",properties:{mode:{type:String,value:"polite"},_text:{type:String,value:""}},created:function(){Polymer.IronA11yAnnouncer.instance||(Polymer.IronA11yAnnouncer.instance=this),document.body.addEventListener("iron-announce",this._onIronAnnounce.bind(this))},announce:function(n){this._text="",this.async(function(){this._text=n},100)},_onIronAnnounce:function(n){n.detail&&n.detail.text&&this.announce(n.detail.text)}}),Polymer.IronA11yAnnouncer.instance=null,Polymer.IronA11yAnnouncer.requestAvailability=function(){Polymer.IronA11yAnnouncer.instance||(Polymer.IronA11yAnnouncer.instance=document.createElement("iron-a11y-announcer")),document.body.appendChild(Polymer.IronA11yAnnouncer.instance)}}();</script></dom-module><script>!function(){var e={},t={},i=null;Polymer.IronMeta=Polymer({is:"iron-meta",properties:{type:{type:String,value:"default",observer:"_typeChanged"},key:{type:String,observer:"_keyChanged"},value:{type:Object,notify:!0,observer:"_valueChanged"},self:{type:Boolean,observer:"_selfChanged"},list:{type:Array,notify:!0}},hostAttributes:{hidden:!0},factoryImpl:function(e){if(e)for(var t in e)switch(t){case"type":case"key":case"value":this[t]=e[t]}},created:function(){this._metaDatas=e,this._metaArrays=t},_keyChanged:function(e,t){this._resetRegistration(t)},_valueChanged:function(e){this._resetRegistration(this.key)},_selfChanged:function(e){e&&(this.value=this)},_typeChanged:function(i){this._unregisterKey(this.key),e[i]||(e[i]={}),this._metaData=e[i],t[i]||(t[i]=[]),this.list=t[i],this._registerKeyValue(this.key,this.value)},byKey:function(e){return this._metaData&&this._metaData[e]},_resetRegistration:function(e){this._unregisterKey(e),this._registerKeyValue(this.key,this.value)},_unregisterKey:function(e){this._unregister(e,this._metaData,this.list)},_registerKeyValue:function(e,t){this._register(e,t,this._metaData,this.list)},_register:function(e,t,i,a){e&&i&&void 0!==t&&(i[e]=t,a.push(t))},_unregister:function(e,t,i){if(e&&t&&e in t){var a=t[e];delete t[e],this.arrayDelete(i,a)}}}),Polymer.IronMeta.getIronMeta=function(){return null===i&&(i=new Polymer.IronMeta),i},Polymer.IronMetaQuery=Polymer({is:"iron-meta-query",properties:{type:{type:String,value:"default",observer:"_typeChanged"},key:{type:String,observer:"_keyChanged"},value:{type:Object,notify:!0,readOnly:!0},list:{type:Array,notify:!0}},factoryImpl:function(e){if(e)for(var t in e)switch(t){case"type":case"key":this[t]=e[t]}},created:function(){this._metaDatas=e,this._metaArrays=t},_keyChanged:function(e){this._setValue(this._metaData&&this._metaData[e])},_typeChanged:function(i){this._metaData=e[i],this.list=t[i],this.key&&this._keyChanged(this.key)},byKey:function(e){return this._metaData&&this._metaData[e]}})}();</script><script>Polymer.IronValidatableBehaviorMeta=null,Polymer.IronValidatableBehavior={properties:{validator:{type:String},invalid:{notify:!0,reflectToAttribute:!0,type:Boolean,value:!1},_validatorMeta:{type:Object},validatorType:{type:String,value:"validator"},_validator:{type:Object,computed:"__computeValidator(validator)"}},observers:["_invalidChanged(invalid)"],registered:function(){Polymer.IronValidatableBehaviorMeta=new Polymer.IronMeta({type:"validator"})},_invalidChanged:function(){this.invalid?this.setAttribute("aria-invalid","true"):this.removeAttribute("aria-invalid")},hasValidator:function(){return null!=this._validator},validate:function(a){return this.invalid=!this._getValidity(a),!this.invalid},_getValidity:function(a){return!this.hasValidator()||this._validator.validate(a)},__computeValidator:function(){return Polymer.IronValidatableBehaviorMeta&&Polymer.IronValidatableBehaviorMeta.byKey(this.validator)}};</script><script>Polymer({is:"iron-input",extends:"input",behaviors:[Polymer.IronValidatableBehavior],properties:{bindValue:{observer:"_bindValueChanged",type:String},preventInvalidInput:{type:Boolean},allowedPattern:{type:String,observer:"_allowedPatternChanged"},_previousValidInput:{type:String,value:""},_patternAlreadyChecked:{type:Boolean,value:!1}},listeners:{input:"_onInput",keypress:"_onKeypress"},registered:function(){this._canDispatchEventOnDisabled()||(this._origDispatchEvent=this.dispatchEvent,this.dispatchEvent=this._dispatchEventFirefoxIE)},created:function(){Polymer.IronA11yAnnouncer.requestAvailability()},_canDispatchEventOnDisabled:function(){var e=document.createElement("input"),t=!1;e.disabled=!0,e.addEventListener("feature-check-dispatch-event",function(){t=!0});try{e.dispatchEvent(new Event("feature-check-dispatch-event"))}catch(e){}return t},_dispatchEventFirefoxIE:function(e){var t=this.disabled;this.disabled=!1;var i=this._origDispatchEvent(e);return this.disabled=t,i},get _patternRegExp(){var e;if(this.allowedPattern)e=new RegExp(this.allowedPattern);else switch(this.type){case"number":e=/[0-9.,e-]/}return e},ready:function(){this.bindValue=this.value},_bindValueChanged:function(){this.value!==this.bindValue&&(this.value=this.bindValue||0===this.bindValue||!1===this.bindValue?this.bindValue:""),this.fire("bind-value-changed",{value:this.bindValue})},_allowedPatternChanged:function(){this.preventInvalidInput=!!this.allowedPattern},_onInput:function(){this.preventInvalidInput&&!this._patternAlreadyChecked&&(this._checkPatternValidity()||(this._announceInvalidCharacter("Invalid string of characters not entered."),this.value=this._previousValidInput)),this.bindValue=this.value,this._previousValidInput=this.value,this._patternAlreadyChecked=!1},_isPrintable:function(e){var t=8==e.keyCode||9==e.keyCode||13==e.keyCode||27==e.keyCode,i=19==e.keyCode||20==e.keyCode||45==e.keyCode||46==e.keyCode||144==e.keyCode||145==e.keyCode||e.keyCode>32&&e.keyCode<41||e.keyCode>111&&e.keyCode<124;return!(t||0==e.charCode&&i)},_onKeypress:function(e){if(this.preventInvalidInput||"number"===this.type){var t=this._patternRegExp;if(t&&!(e.metaKey||e.ctrlKey||e.altKey)){this._patternAlreadyChecked=!0;var i=String.fromCharCode(e.charCode);this._isPrintable(e)&&!t.test(i)&&(e.preventDefault(),this._announceInvalidCharacter("Invalid character "+i+" not entered."))}}},_checkPatternValidity:function(){var e=this._patternRegExp;if(!e)return!0;for(var t=0;t<this.value.length;t++)if(!e.test(this.value[t]))return!1;return!0},validate:function(){var e=this.checkValidity();return e&&(this.required&&""===this.value?e=!1:this.hasValidator()&&(e=Polymer.IronValidatableBehavior.validate.call(this,this.value))),this.invalid=!e,this.fire("iron-input-validate"),e},_announceInvalidCharacter:function(e){this.fire("iron-announce",{text:e})}});</script><dom-module id="heap-element" assetpath="../heap-element/"><template><style>:host {
+			--circle-diameter: 150px;
+			--circle-color: red;
+		}
+		.bs-heap {
+			margin-top: 10px;
+			margin-right: 0px;
+			margin-left: 0px;
+			border-color: #ddd;
+			border-width: 1px;
+			border-radius: 4px 4px 0 0;
+			border-style: solid;
+			padding: 20px;
+			padding-left: 40px;
+			padding-right: 40px;
+		}
+		
+		.input-x {
+			max-width: 500px;
+		}
+
+		input-y {
+			max-width: 500px;
+		}
+		
+		.min-but {
+			min-width: 140px;
+		}
+
+		#circle {
+			width: var(--circle-diameter);
+			height: var(--circle-diameter);
+			max-width: 150px;
+			max-height: 150px;
+			background: var(--circle-color);
+			-moz-border-radius: 50px;
+			-webkit-border-radius: 50px;
+			border-radius: 150px;
+		}
+		.circle-center {
+			display:flex;
+			justify-content: center;
+			align-items: center;
+		}
+		.heap-display {
+			display: flex;
+			align-items: center;
+		}
+
+		@media screen and (max-width: 1220px) {
+			.mid-heap-y {
+				width: 100%;
+				width: calc(100% - 142px);
+				padding-top: 7px;
+				margin-left: 142px;
+			}
+
+			.mid-heap-x {
+				width: 100%;
+			}
+		}</style><div class="row heap-display"><div class="col-lg-10"><form class="bs-heap"><label>Heap Size: [[size]]</label><div class="form-group whole-heap"><button class="btn btn-default min-but" type="button" on-tap="_submit_whole">Take Whole Heap</button></div><div class="form-group end-heap"><div class="input-group"><span class="input-group-btn"><button class="btn btn-default min-but" type="button" value="Take N from end" on-tap="_submit_end">Take 'n' from end</button> </span><input class="form-control" is="iron-input" type="number" bind-value="{{n}}" placeholder="n"></div></div><div class="form-group"><div class="row"><div class="col-lg-7"><div class="input-group mid-heap-x"><span class="input-group-btn"><button class="btn btn-default min-but" type="button" value="Split into X and Y" on-tap="_submit_split">Split into 'x' and 'y'</button> </span><input class="form-control input-x" is="iron-input" type="number" bind-value="{{x}}"></div></div><div class="col-lg-5"><div class="input-group mid-heap-y"><input class="form-control input-y" is="iron-input" type="number" bind-value="{{y}}"></div></div></div></div></form></div><div class="circle-center col-lg-2"><div id="circle" class="circle"></div></div></div></template><script>Polymer({is:"heap-element",properties:{index:{type:Number},size:{type:Number},game:{type:String},max:{type:Number}},attached:function(){var t=["#CC0000","#33b5e5","#669900","#ffbb33"],i=Math.floor(Math.random()*t.length),e=this.size/this.max*150;this.customStyle["--circle-diameter"]=e+"px",this.customStyle["--circle-color"]=t[i],this.updateStyles()},_submit_whole:function(){var t={type:"whole",index:this.index,size:this.size};this._submit(t)},_submit_end:function(){var t={type:"end",index:this.index,size:this.size,num:parseInt(this.n)};this._submit(t)},_submit_split:function(){var t={type:"split",index:this.index,size:this.size,size1:parseInt(this.x),size2:parseInt(this.y)};this._submit(t)},_clear:function(){this.set("n",""),this.set("x",""),this.set("y","")},_submit:function(t){this.fire("move-submission",t),this._clear()}});</script></dom-module><dom-module id="move-element" assetpath="../move-element/"><template><style>.move-box {
+			width: 250px;
+			margin-bottom: 5px;
+			border-color: #ddd;
+			border-width: 1px;
+			border-radius: 4px 4px 0 0;
+			border-style: solid;
+			padding: 5px;
+			text-align: center;
+		}</style><div class="move-box"><p>[[_move_string]]</p></div></template><script>Polymer({is:"move-element",properties:{move:{type:Object,value:{},observer:"_move_changed"},_move_string:{type:String,value:""}},_move_changed:function(){switch(this.move.type){case"whole":this.set("_move_string","A whole pile of size "+this.move.size+" was taken.");break;case"end":1===this.move.num?this.set("_move_string",this.move.num+" bean was removed from the end of a heap of size "+this.move.size+"."):this.move.num>1&&this.set("_move_string",this.move.num+" beans were removed from the end of a heap of size "+this.move.size+".");break;case"split":this.set("_move_string","A heap of size "+this.move.size+" was split into heaps of size "+this.move.size2+" and "+this.move.size2+".");break;default:this.set("_move_string","Unknown move.")}}});</script></dom-module><dom-module id="move-tracker" assetpath="../move-tracker/"><template><style>.moves-container {
+			overflow-y: scroll;
+			flex: 1;
+			flex-direction: column;
+			max-height: inherit;
+		}</style><div class="moves-container"><template is="dom-repeat" items="[[moves]]"><move-element move="[[item]]"></move-element></template></div></template><script>Polymer({is:"move-tracker",properties:{moves:{type:Array,value:[]}}});</script></dom-module></div><dom-module id="gtab-app"><template><style>.form-group, .form-check {
+			padding-bottom: 5px;
+		}
+
+		.radtab {
+			padding-left: 15px;
+		}
+
+		.input-game {
+			max-width: 471px;
+		}
+
+		.input-board {
+			max-width: 500px;
+		}
+
+		#move-tracker {
+			max-height: 300px;
+			float: right;
+		}</style><h1>Generalized take and break</h1><move-tracker id="move-tracker" moves="[[_moves]]"></move-tracker><div id="gameInputWrapper" class="form-group"><label id="gameInputLabel" for="boardInput">Define Game:</label><div class="input-group"><span class="input-group-addon" id="basic-addon1">.</span> <input id="gameInput" type="text" class="form-control input-game" placeholder="Game" aria-describedby="basic-addon1 gameInputHelp" aria-label="gameInputLabel"></div><small id="gameInputHelp" class="form-text text-muted">The game is defined by any number such that each digit of the number is between 0 and 7 inclusive. For Example: 147.</small></div><div id="game-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_game}}">Oh No! Your game was not properly formatted. Try something like 34 (Dawson's Chess).</div><div id="playerTwoInputWrapper" class="form-check"><label for="playerTwoInput" class="form-check-label">Play versus AI? <input class="form-check-input" id="playerTwoInput" type="checkbox" checked=""></label></div><label for="playerSelection">Who goes first?</label><form id="playerSelection" class="form-group radtab" action=""><input class="form-check-input" type="radio" name="firstPlayer" value="computer"> Computer<br><input class="form-check-input" type="radio" name="firstPlayer" value="player" checked=""> Player</form><div class="spacer"></div><label for="boardInput">Define board:</label><div id="boardInputWrapper" class="form-group"><input id="boardInput" type="text" class="form-control input-board" aria-describedby="boardInputHelp" placeholder="Board"> <small id="boardInputHelp" class="form-text text-muted">The board is defined by a comma separated list of heap sizes. Example: 4,10,1 is a game board with a pile of 4, a pile of 10, and a pile of 1.</small></div><div id="board-input-alert" class="alert alert-danger" role="alert" hidden$="{{!_invalid_board}}">Oh no! Your game board was not formatted properly. Try something like 3, 4, 5.</div><button id="startButton" type="button" class="btn btn-default" on-tap="start">Start</button><div class="spacer"></div><hr><template is="dom-repeat" items="[[_heaps]]"><heap-element index="[[index]]" size="[[item.value]]" game="[[_game]]" max="[[_max_heap_size]]" on-move-submission="_player_make_move"></heap-element></template><template is="dom-if" if="[[_game_over]]" restamp="true"><h2>[[_game_over_message]]</h2></template></template><script>Polymer({is:"gtab-app",properties:{_game:{type:String,value:""},_value_sequence:{type:Array,value:[]},_heaps:{type:Array,value:[]},_one_player:{type:Boolean,value:!0},_heap_possible_values:{type:Array,value:[]},_moves:{type:Array,value:[]},_invalid_game:{type:Boolean,value:!1},_invalid_board:{type:Boolean,value:!1}},start:function(){this.set("_moves",[]),this.set("_game_over",!1),this.set("_invalid_board",!1),this.set("_invalid_game",!1);var e=this.$.gameInput.value,a=this.parse_game(e),s=this.$.boardInput.value,i=this.make_board(s),t=this.$.playerTwoInput.checked;if(a&&i){this._game=a,this.set("_heaps",i),this._one_player=t;for(var n=0,r=0;r<this._heaps.length;r++)n=Math.max(n,this._heaps[r].value);if(this.set("_max_heap_size",n),this._one_player&&n){var _=this.calculate_sequence(n,this._game);if(!_)return void console.error("Sequence was not defined correctly.");this._value_sequence=_;var h=document.querySelector('input[name="firstPlayer"]:checked');h&&h.value&&"computer"===h.value&&this._ai_make_move()}}else console.error("Something went wrong... please try again.")},_find_any_move:function(){for(var e=0;e<this._heaps.length;e++)for(var a=this._heaps[e].value,s=0;s<this._game.length;s++){var i=s+1,t=parseInt(this._game[s]);if(1&t&&a===i)return{type:"whole",index:e,size:a};if(2&t&&a>i)return{type:"end",index:e,size:a,num:i};if(4&t&&a-i>1)for(var n,r,_=1;_<=(a-i)/2;_++)return n=_,r=a-i-n,{type:"split",index:e,size:a,size1:n,size2:r}}},_ai_make_move:function(){for(var e,a=!1,s=0;s<this._heaps.length&&!a;s++){for(var i=0,t=0;t<this._heaps.length;t++)t!==s&&(i^=this._value_sequence[this._heaps[t].value]);if(this._heap_possible_values[this._heaps[s].value].has(i))for(var n=this._heaps[s].value,r=0;r<this._game.length;r++){var _=parseInt(this._game[r]),h=r+1;if(1&_&&n===h&&!a&&(e={type:"whole",index:s,size:n},this._value_sequence[0]===i)){a=!0;break}if(2&_&&n-h>0&&!a&&(e={type:"end",index:s,size:n,num:h},this._value_sequence[n-h]===i)){a=!0;break}if(4&_&&n-h>1&&!a)for(var o,l,u=1;u<=(n-h)/2;u++)if(o=u,l=n-h-o,e={type:"split",index:s,size:n,size1:o,size2:l},(this._value_sequence[o]^this._value_sequence[l])===i){a=!0;break}}}if(a||e){if(a&&e){this._make_move(e);console.log("I'm going to win!")}}else{if(e=this._find_any_move())this._make_move(e);console.log("No winning strategy.")}(e=this._find_any_move())||(this.set("_game_over",!0),this.set("_game_over_message","You lose!"))},_player_make_move:function(e){this._make_move(e.detail)&&(this._find_any_move()?this._one_player&&this._ai_make_move():(console.log("You win"),this.set("_game_over",!0),this.set("_game_over_message","You win!")))},_make_move:function(e){var a=!1;switch(e.type){case"whole":if(this._heaps.length>e.index&&this._game.length>e.size-1&&this._game[e.size-1]&&parseInt(this._game[e.size-1])&&1&(s=parseInt(this._game[e.size-1]))){this.splice("_heaps",e.index,1),a=!0;break}break;case"end":if(this._heaps.length>e.index&&this._game.length>e.num-1&&this._game[e.num-1]&&parseInt(this._game[e.num-1])){var s=parseInt(this._game[e.num-1]),i=this._heaps[e.index].value-e.num;if(2&s&&i>0){this.splice("_heaps",e.index,1,{value:i}),a=!0;break}}break;case"split":var t=e.size-(e.size1+e.size2);if(this._heaps.length>e.index&&this._game.length>t-1&&this._game[t-1]&&parseInt(this._game[t-1])&&t>0&&e.size1>0&&e.size2>0&&4&(s=parseInt(this._game[t-1]))){this.splice("_heaps",e.index,1,{value:e.size1},{value:e.size2}),a=!0;break}}return a&&this.push("_moves",e),a},parse_game:function(e){return 0===e.length?(console.error("Invalid game: empty string."),this.set("_invalid_game",!0),!1):("."===e[0]&&(e=e.substring(1)),/[^0-7]/.test(e)?(console.error("Invalid game: numbers greater than 7 are not supported."),this.set("_invalid_game",!0),!1):e)},make_board:function(e){if(0===e.length)return console.error("Invalid board: no board defined."),this.set("_invalid_board",!0),!1;if(/[^0-9, ]/.test(e))return console.error("Invalid board: string contains invalid characters."),this.set("_invalid_board",!0),!1;var a=e.split(",");return 0===(a=a.map(function(e){return 0===(e=e.trim()).length?0:{value:parseInt(e)}})).length?(console.error("Invalid board: heaps are empty."),this.set("_invalid_board",!0),!1):a},calculate_sequence:function(e,a){this._heap_possible_values=[new Set];for(var s=[0],i=1;i<=e;){for(var t=new Set,n=0;n<a.length;n++){var r=parseInt(a[n]),_=n+1;if(1&r&&i===_&&t.add(s[0]),2&r&&i-_>0&&t.add(s[i-_]),4&r&&i-_>1)for(var h,o,l=1;l<=(i-_)/2;l++)o=i-_-(h=l),t.add(s[h]^s[o])}this._heap_possible_values.push(t);var e;if(t.forEach(function(e){last=e}),e){if(e===t.length+1)s.push(e+1);else for(l=0;l<=e;l++)if(!t.has(l)){s.push(l);break}}else s.push(0);i++}return s}});</script></dom-module>
